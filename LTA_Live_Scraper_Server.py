@@ -18,6 +18,7 @@ app.add_middleware(
 
 SECRET_KEY = os.getenv("APP_SECRET_KEY", "AGP2026!")
 
+# Canterbury, Kent (CT2 7LN) Coordinates
 CANTERBURY_LAT = 51.2974
 CANTERBURY_LON = 1.0664
 
@@ -43,23 +44,26 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
   headers = {
     "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
     "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
     "Referer": "https://competitions.lta.org.uk/find"
   }
 
   lta_api_url = "https://competitions.lta.org.uk/api/tournament/search"
 
-  params = {
+  # LTA API expects a JSON payload body for search filters
+  payload = {
     "distance": 100,
     "latitude": CANTERBURY_LAT,
     "longitude": CANTERBURY_LON,
-    "ageGroup": "10U",
-    "status": "OpenForEntry"
+    "ageGroups": ["10U"],
+    "grades": ["3", "4"],
+    "status": ["OpenForEntry"]
   }
 
   tournaments = []
 
   try:
-    response = requests.get(lta_api_url, headers=headers, params=params, timeout=10)
+    response = requests.post(lta_api_url, headers=headers, json=payload, timeout=12)
     if response.status_code == 200:
       raw_data = response.json()
       items = raw_data.get("items", []) if isinstance(raw_data, dict) else raw_data
