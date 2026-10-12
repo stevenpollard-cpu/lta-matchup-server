@@ -1,119 +1,93 @@
-import requests
-from bs4 import BeautifulSoup
-from fastapi import FastAPI, Header, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
-import math
 import os
+import math
+import requests
+import uvicorn
+from fastapi import FastAPI, Header, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
 
-# -------------------------------------------------------------------
-# SECURITY CONFIGURATION
-# Set your secret token. Only requests sending this header will be accepted.
-# -------------------------------------------------------------------
-SECRET_API_KEY = os.environ.get("APP_SECRET_KEY", "AvaPollard2026SecretKey!")
+app = FastAPI(title="Ava LTA Tournament Radar API")
 
-app = FastAPI(title="Live LTA 10U Matchup API")
-
-# Enable CORS for cross-origin browser access from mobile devices
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+CORSMiddleware,
+allow_origins=["*"],
+allow_credentials=True,
+allow_methods=["*"],
+allow_headers=["*"],
 )
 
-# Reference Coordinates for Postcode CT2 7LN (Canterbury)
-ORIGIN_LAT = 51.297
-ORIGIN_LON = 1.071
+SECRET_KEY = os.getenv("APP_SECRET_KEY", "AGP2026!")
 
-def haversine_distance(lat1, lon1, lat2, lon2):
-    """Calculates distance in miles between two coordinates."""
-    R = 3958.8  # Earth radius in miles
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    a = math.sin(dlat / 2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return round(R * c, 1)
+# CT2 7LN Coordinates (Canterbury, Kent)
+CANTERBURY_LAT = 51.2974
+CANTERBURY_LON = 1.0664
+
+def calculate_haversine_distance(lat1, lon1, lat2, lon2):
+"""Calculate distance in miles between two coordinates."""
+R = 3958.8 # Earth radius in miles
+dlat = math.radians(lat2 - lat1)
+dlon = math.radians(lon2 - lon1)
+a = (math.sin(dlat / 2) ** 2 +
+math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
+math.sin(dlon / 2) ** 2)
+c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+return round(R * c, 1)
 
 @app.get("/")
-def home():
-    return {"status": "Live LTA Matchup API Operational", "player": "Ava Pollard"}
+def root():
+return {"status": "Live LTA Matchup API Operational", "player": "Ava Pollard"}
 
 @app.get("/api/live-tournaments")
-def get_live_tournaments(
-    postcode: str = Query("CT27LN"),
-    radius: float = Query(100.0),
-    x_app_token: str = Header(None)
-):
-    """
-    Scrapes live 10U Grade 3 & Grade 4 tournament records from LTA Competitions.
-    Requires secret x_app_token header for authorization.
-    """
-    # 1. Security Check
-    if x_app_token != SECRET_API_KEY:
-        raise HTTPException(status_code=403, detail="Unauthorized: Invalid Secret Access Token")
+def get_tournaments(x_app_token: Optional[str] = Header(None)):
+if x_app_token != SECRET_KEY:
+raise HTTPException(status_code=403, detail="Unauthorized access token")
 
-    # 2. Target LTA Competition Search API URL
-    lta_search_url = "https://competitions.lta.org.uk/find"
-    params = {
-        "AgeGroup": "10U",
-        "Grade": "3,4",
-        "Distance": radius,
-        "Postcode": postcode
-    }
-    
-    headers = {
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15"
-    }
+# Official LTA Tournament Search API Endpoint
+lta_api_url = "https://competitions.lta.org.uk/api/tournament/search"
 
-    tournaments_list = []
+# Search parameters for 10U, G3 & G4 open entries
+params = {
+"distance": 100,
+"latitude": CANTERBURY_LAT,
+"longitude": CANTERBURY_LON,
+"ageGroup": "10U",
+"grades": "3,4",
+"status": "OpenForEntry"
+}
 
-    try:
-        response = requests.get(lta_search_url, params=params, headers=headers, timeout=10)
-        
-        # Parse HTML response if available
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            cards = soup.find_all('div', class_='tournament-card')
-            
-            for card in cards:
-                title_elem = card.find('h3') or card.find('a', class_='title')
-                code_elem = card.find('span', class_='code')
-                venue_elem = card.find('span', class_='venue')
-                date_elem = card.find('span', class_='date')
-                link_elem = card.find('a', href=True)
-                
-                if title_elem:
-                    name = title_elem.text.strip()
-                    code = code_elem.text.strip() if code_elem else "10U G4"
-                    venue = venue_elem.text.strip() if venue_elem else "Kent / South East Venue"
-                    dates = date_elem.text.strip() if date_elem else "Upcoming 2026"
-                    link = link_elem['href'] if link_elem else "https://competitions.lta.org.uk"
-                    
-                    if not link.startswith("http"):
-                        link = f"https://competitions.lta.org.uk{link}"
-                        
-                    tournaments_list.append({
-                        "id": code,
-                        "code": code,
-                        "name": name,
-                        "venue": venue,
-                        "dates": dates,
-                        "distance": 15.5,
-                        "grade": 3 if "G3" in code or "Grade 3" in name else 4,
-                        "link": link,
-                        "entrants": []
-                    })
-    except Exception as e:
-        print(f"Scraping note: {str(e)}")
+tournaments = []
 
-    return {
-        "postcode": postcode,
-        "radius": radius,
-        "total_events": len(tournaments_list),
-        "tournaments": tournaments_list
-    }
+try:
+response = requests.get(lta_api_url, params=params, timeout=10)
+
+if response.status_code == 200:
+raw_data = response.json()
+items = raw_data.get("items", []) if isinstance(raw_data, dict) else raw_data
+
+for item in items:
+# Extract coordinates if available
+venue_lat = item.get("latitude", CANTERBURY_LAT)
+venue_lon = item.get("longitude", CANTERBURY_LON)
+dist = calculate_haversine_distance(CANTERBURY_LAT, CANTERBURY_LON, venue_lat, venue_lon)
+
+if dist <= 100:
+tournaments.append({
+"id": str(item.get("id", "")),
+"name": item.get("name", "10U Tournament"),
+"grade": f"G{item.get('grade', 4)}",
+"location": item.get("venueName", "LTA Venue"),
+"distanceMiles": dist,
+"startDate": item.get("startDate", "Upcoming"),
+"ltaUrl": f"https://competitions.lta.org.uk/tournament/{item.get('code', '')}",
+"entrantsCount": item.get("entrantsCount", 0)
+})
+except Exception as e:
+print(f"LTA API Query Error: {e}")
+
+# Return sorted by distance from Canterbury
+tournaments.sort(key=lambda x: x["distanceMiles"])
+return tournaments
 
 if __name__ == "__main__":
-    uvicorn.run("lta_scraper_server:app", host="0.0.0.0", port=8000, reload=True)
+port = int(os.environ.get("PORT", 10000))
+uvicorn.run(app, host="0.0.0.0", port=port)
