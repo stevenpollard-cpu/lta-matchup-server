@@ -320,7 +320,7 @@ font-size: 0.9rem;
 <script>
 const RENDER_API_URL = "https://ava-lta-scraper.onrender.com/api/live-tournaments";
 const SECRET_KEY = "AGP2026!";
-const APP_PIN = "2026"; // Set your 4-digit PIN here
+const APP_PIN = "2026";
 
 function checkAuth() {
 if (localStorage.getItem('ava_app_unlocked') === 'true') {
@@ -353,7 +353,6 @@ document.getElementById('pin-input').value = '';
 checkAuth();
 }
 
-// Allow pressing Enter key on PIN input
 document.getElementById('pin-input').addEventListener('keyup', function(e) {
 if (e.key === 'Enter') {
 verifyPin();
@@ -375,8 +374,8 @@ if (!response.ok) {
 throw new Error(`Server returned status: ${response.status}`);
 }
 
-const tournaments = await response.json();
-renderTournaments(tournaments);
+const data = await response.json();
+renderTournaments(data);
 } catch (err) {
 container.innerHTML = `
 <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 16px; border-radius: 12px; color: #fca5a5;">
@@ -388,14 +387,27 @@ ${err.message}<br><br>
 }
 }
 
-function renderTournaments(tournaments) {
+function renderTournaments(data) {
 const container = document.getElementById('tournament-container');
-if (!tournaments || tournaments.length === 0) {
+
+// Handle non-array responses gracefully
+if (!Array.isArray(data)) {
+if (data && data.status) {
+container.innerHTML = `<div class="loader">${data.status}</div>`;
+} else if (data && data.detail) {
+container.innerHTML = `<div class="loader">${data.detail}</div>`;
+} else {
+container.innerHTML = '<div class="loader">No open 10U G3/G4 tournaments match your distance criteria right now.</div>';
+}
+return;
+}
+
+if (data.length === 0) {
 container.innerHTML = '<div class="loader">No open 10U G3/G4 tournaments match your distance criteria right now.</div>';
 return;
 }
 
-container.innerHTML = tournaments.map(t => `
+container.innerHTML = data.map(t => `
 <div class="tournament-card">
 <span class="grade-badge ${t.grade ? t.grade.toLowerCase() : 'g4'}">${t.grade || 'G4'}</span>
 <div class="t-title">${t.name}</div>
@@ -404,13 +416,12 @@ container.innerHTML = tournaments.map(t => `
 <div class="t-info">👥 Entrants: ${t.entrantsCount || 0} players</div>
 
 <div class="t-actions">
-<a href="${t.ltaUrl}" target="_blank" class="btn btn-primary">View on LTA</a>
+<a href="${t.ltaUrl || '#'}" target="_blank" class="btn btn-primary">View on LTA</a>
 </div>
 </div>
 `).join('');
 }
 
-// Check PIN on load
 checkAuth();
 </script>
 </body>
