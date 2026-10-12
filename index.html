@@ -387,36 +387,24 @@ ${err.message}<br><br>
 }
 }
 
-function renderTournaments(data) {
+function renderTournaments(tournaments) {
 const container = document.getElementById('tournament-container');
-
-// Handle non-array responses gracefully
-if (!Array.isArray(data)) {
-if (data && data.status) {
-container.innerHTML = `<div class="loader">${data.status}</div>`;
-} else if (data && data.detail) {
-container.innerHTML = `<div class="loader">${data.detail}</div>`;
-} else {
-container.innerHTML = '<div class="loader">No open 10U G3/G4 tournaments match your distance criteria right now.</div>';
-}
-return;
-}
-
-if (data.length === 0) {
+if (!tournaments || tournaments.length === 0) {
 container.innerHTML = '<div class="loader">No open 10U G3/G4 tournaments match your distance criteria right now.</div>';
 return;
 }
 
-container.innerHTML = data.map(t => `
+container.innerHTML = tournaments.map(t => `
 <div class="tournament-card">
 <span class="grade-badge ${t.grade ? t.grade.toLowerCase() : 'g4'}">${t.grade || 'G4'}</span>
 <div class="t-title">${t.name}</div>
 <div class="t-info">📍 ${t.location} (${t.distanceMiles} mi)</div>
 <div class="t-info">📅 ${t.startDate}</div>
 <div class="t-info">👥 Entrants: ${t.entrantsCount || 0} players</div>
+${t.analysis ? `<div style="margin-top: 10px; padding: 8px 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 6px; font-size: 0.8rem; color: #93c5fd;">💡 <strong>Radar Analysis:</strong> ${t.analysis}</div>` : ''}
 
 <div class="t-actions">
-<a href="${t.ltaUrl || '#'}" target="_blank" class="btn btn-primary">View on LTA</a>
+<a href="${t.ltaUrl}" target="_blank" class="btn btn-primary">View on LTA</a>
 </div>
 </div>
 `).join('');
