@@ -9,11 +9,11 @@ from typing import Optional
 app = FastAPI(title="Ava LTA Tournament Radar API")
 
 app.add_middleware(
-CORSMiddleware,
-allow_origins=["*"],
-allow_credentials=True,
-allow_methods=["*"],
-allow_headers=["*"],
+  CORSMiddleware,
+  allow_origins=["*"],
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
 )
 
 SECRET_KEY = os.getenv("APP_SECRET_KEY", "AGP2026!")
@@ -22,18 +22,18 @@ CANTERBURY_LAT = 51.2974
 CANTERBURY_LON = 1.0664
 
 def calculate_haversine_distance(lat1, lon1, lat2, lon2):
-R = 3958.8 # Earth radius in miles
-dlat = math.radians(lat2 - lat1)
-dlon = math.radians(lon2 - lon1)
-a = (math.sin(dlat / 2) ** 2 +
-math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
-math.sin(dlon / 2) ** 2)
-c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-return round(R * c, 1)
+  R = 3958.8 # Earth radius in miles
+  dlat = math.radians(lat2 - lat1)
+  dlon = math.radians(lon2 - lon1)
+  a = (math.sin(dlat / 2) ** 2 +
+  math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
+  math.sin(dlon / 2) ** 2)
+  c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+  return round(R * c, 1)
 
 @app.get("/")
 def root():
-return {"status": "Live LTA Matchup API Operational", "player": "Ava Pollard"}
+  return {"status": "Live LTA Matchup API Operational", "player": "Ava Pollard"}
 
 @app.get("/api/live-tournaments")
 def get_tournaments(x_app_token: Optional[str] = Header(None)):
