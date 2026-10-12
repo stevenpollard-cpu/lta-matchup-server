@@ -18,7 +18,6 @@ allow_headers=["*"],
 
 SECRET_KEY = os.getenv("APP_SECRET_KEY", "AGP2026!")
 
-# Canterbury, Kent (CT2 7LN) Coordinates
 CANTERBURY_LAT = 51.2974
 CANTERBURY_LON = 1.0664
 
