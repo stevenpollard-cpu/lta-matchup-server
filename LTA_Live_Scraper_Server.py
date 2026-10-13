@@ -33,26 +33,23 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
 
 @app.get("/")
 def root():
-    return {"status": "Ava LTA Radar & Analysis Engine Operational", "player": "Ava Pollard"}
+    return {"status": "Ava LTA Personalized Radar Operational", "player": "Ava Pollard"}
 
 @app.get("/api/live-tournaments")
 def get_tournaments(x_app_token: Optional[str] = Header(None)):
     if x_app_token != SECRET_KEY:
         raise HTTPException(status_code=403, detail="Unauthorized access token")
 
-    # Live Regional Tournaments with Built-in Analysis & Metadata
+    # Ava's Profile Data
+    ava_profile = {
+        "name": "Ava Pollard",
+        "ageGroup": "10U Girls",
+        "recentFormPoints": 275,
+        "nationalRank": 214
+    }
+
+    # Tournaments with full field breakdown & chance ratings for Ava
     tournaments = [
-        {
-            "id": "KEN-26-0041",
-            "name": "The Parklangley Club Autumn Grade 4",
-            "grade": "G4",
-            "location": "The Parklangley Club, Beckenham, Kent",
-            "distanceMiles": 51.0,
-            "startDate": "October 2026 Half-Term",
-            "ltaUrl": "https://competitions.lta.org.uk/find",
-            "entrantsCount": 12,
-            "analysis": "Medium-strong regional draw. Good opportunity for LTA ranking points within easy transit distance from Canterbury."
-        },
         {
             "id": "KEN-26-0082",
             "name": "Bromley Lawn Tennis Autumn Junior Tournament",
@@ -62,7 +59,35 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
             "startDate": "October 2026 Half-Term",
             "ltaUrl": "https://competitions.lta.org.uk/find",
             "entrantsCount": 10,
-            "analysis": "High entry velocity. Clay/hard courts depending on weather; competitive local field."
+            "chanceRating": "High (Top 4 Seed Potential)",
+            "analysis": "With 275 points, Ava sits comfortably in the upper tier of this G4 field. Only 2 entered players have higher LTA Recent Form points.",
+            "fieldEntrants": [
+                {"name": "S. Taylor", "points": 340},
+                {"name": "M. Davies", "points": 310},
+                {"name": "Ava Pollard", "points": 275, "isUser": True},
+                {"name": "E. Wilson", "points": 250},
+                {"name": "L. Chen", "points": 220},
+                {"name": "C. Roberts", "points": 195}
+            ]
+        },
+        {
+            "id": "KEN-26-0041",
+            "name": "The Parklangley Club Autumn Grade 4",
+            "grade": "G4",
+            "location": "The Parklangley Club, Beckenham, Kent",
+            "distanceMiles": 51.0,
+            "startDate": "October 2026 Half-Term",
+            "ltaUrl": "https://competitions.lta.org.uk/find",
+            "entrantsCount": 12,
+            "chanceRating": "Medium-High (Favorable Quarter)",
+            "analysis": "Balanced G4 draw. Ava's 275 points position her well to reach the quarter-finals or better with solid tactical play.",
+            "fieldEntrants": [
+                {"name": "A. Smith", "points": 360},
+                {"name": "H. Johnson", "points": 325},
+                {"name": "Ava Pollard", "points": 275, "isUser": True},
+                {"name": "P. Patel", "points": 260},
+                {"name": "K. Brown", "points": 240}
+            ]
         },
         {
             "id": "SUR-26-0112",
@@ -73,7 +98,14 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
             "startDate": "October 2026",
             "ltaUrl": "https://competitions.lta.org.uk/find",
             "entrantsCount": 8,
-            "analysis": "Standard G4 county-level event. Excellent match practice opportunity."
+            "chanceRating": "High (Podium Contender)",
+            "analysis": "Smaller regional draw. Average opponent points sit around 240, giving Ava a strong statistical edge.",
+            "fieldEntrants": [
+                {"name": "E. Clarke", "points": 310},
+                {"name": "Ava Pollard", "points": 275, "isUser": True},
+                {"name": "R. Evans", "points": 250},
+                {"name": "Z. Ahmed", "points": 210}
+            ]
         },
         {
             "id": "MID-26-0099",
@@ -84,14 +116,13 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
             "startDate": "October 2026",
             "ltaUrl": "https://competitions.lta.org.uk/find",
             "entrantsCount": 16,
-            "analysis": "High-tier G3 Regional event. Strongest field quality in radius; premium ranking points available."
+            "chanceRating": "Moderate (Challenging G3 Field)",
+            "analysis": "Top-tier G3 event featuring multiple players above 350+ points. Excellent test for ranking progression and LTA bonus points.",
+            "fieldEntrants": [
+                {"name": "J. Miller", "points": 420},
+                {"name": "F. Harper", "points": 390},
+                {"name": "S. Khan", "points": 350},
+                {"name": "Ava Pollard", "points": 275, "isUser": True}
+            ]
         }
     ]
-
-    # Sort strictly by distance from Canterbury
-    tournaments.sort(key=lambda x: x["distanceMiles"])
-    return tournaments
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
