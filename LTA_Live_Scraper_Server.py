@@ -22,19 +22,28 @@ APP_PIN = os.getenv("APP_PIN_CODE", "2026")
 CANTERBURY_LAT = 51.2974
 CANTERBURY_LON = 1.0664
 
+
 def calculate_haversine_distance(lat1, lon1, lat2, lon2):
     R = 3958.8
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
-    a = (math.sin(dlat / 2) ** 2 +
-         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
-         math.sin(dlon / 2) ** 2)
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(math.radians(lat1))
+        * math.cos(math.radians(lat2))
+        * math.sin(dlon / 2) ** 2
+    )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return round(R * c, 1)
 
+
 @app.get("/")
 def root():
-    return {"status": "Ava LTA Personalized Radar Operational", "player": "Ava Pollard"}
+    return {
+        "status": "Ava LTA Personalized Radar Operational",
+        "player": "Ava Pollard",
+    }
+
 
 @app.post("/api/verify-pin")
 def verify_pin(data: dict):
@@ -43,6 +52,7 @@ def verify_pin(data: dict):
         return {"success": True, "token": SECRET_KEY}
     else:
         raise HTTPException(status_code=401, detail="Invalid PIN")
+
 
 @app.get("/api/live-tournaments")
 def get_tournaments(x_app_token: Optional[str] = Header(None)):
@@ -54,7 +64,7 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
         "name": "Ava Pollard",
         "ageGroup": "10U Girls",
         "recentFormPoints": 275,
-        "nationalRank": 214
+        "nationalRank": 214,
     }
 
     # Expanded Winter Circuit through December 2026
@@ -76,8 +86,8 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
                 {"name": "M. Davies", "points": 310},
                 {"name": "Ava Pollard", "points": 275, "isUser": True},
                 {"name": "E. Wilson", "points": 250},
-                {"name": "L. Chen", "points": 220}
-            ]
+                {"name": "L. Chen", "points": 220},
+            ],
         },
         {
             "id": "KEN-26-0041",
@@ -94,10 +104,9 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
                 {"name": "A. Smith", "points": 360},
                 {"name": "H. Johnson", "points": 325},
                 {"name": "Ava Pollard", "points": 275, "isUser": True},
-                {"name": "P. Patel", "points": 260}
-            ]
+                {"name": "P. Patel", "points": 260},
+            ],
         },
-
         # --- NOVEMBER 2026 ---
         {
             "id": "KEN-26-0105",
@@ -108,41 +117,4 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
             "startDate": "14–15 Nov 2026",
             "ltaUrl": "https://competitions.lta.org.uk/find",
             "entrantsCount": 16,
-            "chanceRating": "Moderate (Tier 1 Regional Field)",
-            "analysis": "Premium Winter Regional Tour event. Ideal opportunity to test form against top 150 national players and earn valuable G3 bonus points.",
-            "fieldEntrants": [
-                {"name": "O. Wright", "points": 410},
-                {"name": "C. Hughes", "points": 380},
-                {"name": "K. Zhang", "points": 330},
-                {"name": "Ava Pollard", "points": 275, "isUser": True},
-                {"name": "B. Scott", "points": 260}
-            ]
-        },
-        {
-            "id": "SUR-26-0140",
-            "name": "Sutton Tennis Academy November Fast4 Open",
-            "grade": "G4",
-            "location": "Sutton Tennis Academy, Surrey",
-            "distanceMiles": 59.8,
-            "startDate": "22 Nov 2026",
-            "ltaUrl": "https://competitions.lta.org.uk/find",
-            "entrantsCount": 8,
-            "chanceRating": "High (Top Seed Contender)",
-            "analysis": "Fast-paced indoor Fast4 format. Ava enters as one of the top seeds based on current LTA form.",
-            "fieldEntrants": [
-                {"name": "Ava Pollard", "points": 275, "isUser": True},
-                {"name": "T. Baker", "points": 240},
-                {"name": "H. Green", "points": 210},
-                {"name": "M. Cox", "points": 185}
-            ]
-        },
-
-        # --- DECEMBER 2026 (Festive Circuit) ---
-        {
-            "id": "SUS-26-0090",
-            "name": "Preston Lawn Tennis Club Winter Open",
-            "grade": "G4",
-            "location": "Preston LTC, Brighton, Sussex",
-            "distanceMiles": 62.3,
-            "startDate": "05–06 Dec 2026",
-            "l
+            "chanceRating": "Moderate (Tier 1
