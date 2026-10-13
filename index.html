@@ -2,22 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ava Pollard • 10U LTA Radar</title>
+<link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Ava LTA Radar</title>
 <style>
 :root {
---primary: #10b981;
---primary-dark: #059669;
---bg: #0f172a;
---card-bg: #1e293b;
---text: #f8fafc;
+--bg-color: #0f172a;
+--card-bg: rgba(30, 41, 59, 0.7);
+--accent-blue: #3b82f6;
+--accent-green: #10b981;
+--text-main: #f8fafc;
 --text-muted: #94a3b8;
---border: #334155;
---accent: #3b82f6;
---warning: #f59e0b;
---danger: #ef4444;
 }
 
 * {
@@ -25,252 +22,143 @@ box-sizing: border-box;
 margin: 0;
 padding: 0;
 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
--webkit-tap-highlight-color: transparent;
 }
 
 body {
-background-color: var(--bg);
-color: var(--text);
+background-color: var(--bg-color);
+color: var(--text-main);
 padding: 16px;
-padding-bottom: 40px;
 max-width: 600px;
 margin: 0 auto;
+min-height: 100vh;
 }
 
-/* PIN LOCK OVERLAY */
+/* PIN Modal */
 #pin-overlay {
 position: fixed;
-top: 0;
-left: 0;
-width: 100vw;
-height: 100vh;
-background: var(--bg);
-z-index: 9999;
+top: 0; left: 0; right: 0; bottom: 0;
+background: rgba(15, 23, 42, 0.95);
+backdrop-filter: blur(8px);
 display: flex;
 flex-direction: column;
-align-items: center;
 justify-content: center;
+align-items: center;
+z-index: 1000;
 padding: 20px;
-text-align: center;
 }
 
 .pin-box {
-background: var(--card-bg);
-border: 1px solid var(--border);
-padding: 30px 24px;
-border-radius: 20px;
+background: rgba(30, 41, 59, 0.9);
+border: 1px solid rgba(255, 255, 255, 0.1);
+padding: 24px;
+border-radius: 16px;
+text-align: center;
 width: 100%;
 max-width: 320px;
 box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
-.pin-title {
-font-size: 1.25rem;
-font-weight: 700;
-margin-bottom: 8px;
-}
-
-.pin-sub {
-font-size: 0.85rem;
-color: var(--text-muted);
-margin-bottom: 20px;
-}
-
 .pin-input {
 width: 100%;
 padding: 12px;
+margin: 16px 0;
 font-size: 1.5rem;
-letter-spacing: 8px;
 text-align: center;
-background: #090d16;
-border: 1px solid var(--border);
-color: var(--primary);
-border-radius: 12px;
-margin-bottom: 16px;
+letter-spacing: 8px;
+background: #0f172a;
+border: 1px solid var(--accent-blue);
+color: #fff;
+border-radius: 8px;
 outline: none;
 }
 
-.pin-input:focus {
-border-color: var(--primary);
-}
-
-.pin-btn {
+.btn-unlock {
 width: 100%;
 padding: 12px;
-background: var(--primary);
-color: #000;
-font-weight: 700;
+background: var(--accent-blue);
+color: white;
 border: none;
-border-radius: 12px;
+border-radius: 8px;
+font-weight: bold;
 font-size: 1rem;
 cursor: pointer;
 }
 
-.pin-error {
-color: var(--danger);
-font-size: 0.8rem;
-margin-top: 10px;
-display: none;
-}
-
-/* MAIN APP LAYOUT */
-#app-content {
-display: none;
-}
-
-header {
-margin-bottom: 20px;
-padding-top: 10px;
+/* Header & Dashboard */
+.header {
 display: flex;
 justify-content: space-between;
-align-items: flex-start;
+align-items: center;
+margin-bottom: 12px;
 }
 
-.header-left {
-flex: 1;
-}
-
-.badge {
+.tag {
 background: rgba(16, 185, 129, 0.15);
-color: var(--primary);
+color: var(--accent-green);
 padding: 4px 10px;
-border-radius: 12px;
+border-radius: 20px;
 font-size: 0.75rem;
-font-weight: 600;
-text-transform: uppercase;
+font-weight: bold;
 letter-spacing: 0.5px;
-display: inline-block;
-margin-bottom: 8px;
-border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-h1 {
-font-size: 1.5rem;
-font-weight: 700;
-}
-
-.subtitle {
+.btn-lock {
+background: rgba(255,255,255,0.08);
 color: var(--text-muted);
-font-size: 0.875rem;
-margin-top: 4px;
-}
-
-.lock-icon-btn {
-background: var(--card-bg);
-border: 1px solid var(--border);
-color: var(--text-muted);
-padding: 8px 12px;
-border-radius: 10px;
+border: none;
+padding: 6px 12px;
+border-radius: 8px;
 font-size: 0.8rem;
 cursor: pointer;
 }
 
-.status-card {
+.player-banner {
+background: rgba(59, 130, 246, 0.1);
+border: 1px solid rgba(59, 130, 246, 0.2);
+padding: 12px;
+border-radius: 10px;
+font-size: 0.85rem;
+margin-bottom: 16px;
+color: #bfdbfe;
+}
+
+.status-bar {
 background: var(--card-bg);
-border: 1px solid var(--border);
-border-radius: 16px;
-padding: 16px;
-margin-bottom: 20px;
+border: 1px solid rgba(255,255,255,0.05);
+padding: 12px 16px;
+border-radius: 12px;
 display: flex;
-align-items: center;
 justify-content: space-between;
-}
-
-.status-indicator {
-display: flex;
 align-items: center;
-gap: 8px;
-font-size: 0.875rem;
-font-weight: 500;
+margin-bottom: 20px;
 }
 
-.dot {
-width: 10px;
-height: 10px;
-border-radius: 50%;
-background-color: var(--primary);
-box-shadow: 0 0 8px var(--primary);
-}
-
-.refresh-btn {
-background: var(--accent);
+.btn-refresh {
+background: var(--accent-blue);
 color: white;
 border: none;
 padding: 8px 14px;
-border-radius: 10px;
-font-weight: 600;
-font-size: 0.8rem;
+border-radius: 8px;
+font-weight: bold;
+font-size: 0.85rem;
 cursor: pointer;
 }
 
-.section-title {
-font-size: 1.1rem;
-font-weight: 600;
-margin-bottom: 12px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-}
-
+/* Cards */
 .tournament-card {
 background: var(--card-bg);
-border: 1px solid var(--border);
-border-radius: 16px;
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 12px;
 padding: 16px;
 margin-bottom: 16px;
-position: relative;
 }
 
-.grade-badge {
-position: absolute;
-top: 16px;
-right: 16px;
-padding: 4px 8px;
-border-radius: 8px;
-font-size: 0.75rem;
-font-weight: 700;
-}
-
-.g3 { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid var(--warning); }
-.g4 { background: rgba(59, 130, 246, 0.2); color: var(--accent); border: 1px solid var(--accent); }
-
-.t-title {
-font-size: 1.05rem;
-font-weight: 600;
-padding-right: 50px;
-margin-bottom: 6px;
-}
-
-.t-info {
-font-size: 0.85rem;
-color: var(--text-muted);
-margin-bottom: 4px;
-}
-
-.t-actions {
-margin-top: 14px;
-display: flex;
-gap: 8px;
-}
-
-.btn {
-flex: 1;
-text-align: center;
-padding: 10px;
-border-radius: 10px;
-text-decoration: none;
-font-size: 0.85rem;
-font-weight: 600;
-}
-
-.btn-primary {
-background: var(--primary);
-color: #000;
-}
+.badge-g4 { background: #2563eb; color: #fff; }
+.badge-g3 { background: #7c3aed; color: #fff; }
 
 .loader {
 text-align: center;
-padding: 40px;
+padding: 40px 20px;
 color: var(--text-muted);
 font-size: 0.9rem;
 }
@@ -278,112 +166,120 @@ font-size: 0.9rem;
 </head>
 <body>
 
-<!-- PIN LOCK OVERLAY -->
+<!-- PIN Protection Modal -->
 <div id="pin-overlay">
 <div class="pin-box">
-<div class="pin-title">🔒 Private Access</div>
-<div class="pin-sub">Enter PIN to access Ava LTA Radar</div>
-<input type="password" id="pin-input" class="pin-input" maxlength="4" placeholder="••••" pattern="[0-9]*" inputmode="numeric">
-<button class="pin-btn" onclick="verifyPin()">Unlock App</button>
-<div id="pin-error" class="pin-error">Incorrect PIN. Try again.</div>
+<h3 style="margin-bottom: 8px;">Ava LTA Radar</h3>
+<p style="font-size: 0.85rem; color: var(--text-muted);">Enter Access PIN</p>
+<input type="password" id="pin-field" class="pin-input" maxlength="4" placeholder="••••" pattern="\d*">
+<button onclick="submitPin()" class="btn-unlock">Unlock Radar</button>
+<p id="pin-error" style="color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none;">Invalid Access PIN</p>
 </div>
 </div>
 
-<!-- MAIN DASHBOARD CONTENT -->
-<div id="app-content">
-<header>
-<div class="header-left">
-<span class="badge">Ava Pollard • 10U Radar</span>
-<h1>LTA Tournament Finder</h1>
-<p class="subtitle">Live analysis for 100mi radius from CT2 7LN</p>
-</div>
-<button class="lock-icon-btn" onclick="lockApp()">🔒 Lock</button>
-</header>
-
-<div class="status-card">
-<div class="status-indicator">
-<div class="dot"></div>
-<span>Connected to Render API</span>
-</div>
-<button class="refresh-btn" onclick="fetchTournaments()">Refresh Live</button>
+<!-- Dashboard Content -->
+<div id="dashboard-content" style="display: none;">
+<div class="header">
+<span class="tag">AVA POLLARD • 10U RADAR</span>
+<button onclick="lockApp()" class="btn-lock">🔒 Lock</button>
 </div>
 
-<div class="section-title">
-<span>Upcoming Tournaments</span>
+<h1 style="font-size: 1.5rem; margin-bottom: 4px;">LTA Tournament Finder</h1>
+<p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Live analysis for 100mi radius from CT2 7LN</p>
+
+<div id="player-stats" class="player-banner">
+🎾 <strong>Ava Pollard</strong> (10U) | Loading player rank & form...
 </div>
 
+<div class="status-bar">
+<span style="font-size: 0.85rem; color: #34d399;">🟢 Connected to Render API</span>
+<button onclick="fetchTournaments()" class="btn-refresh">Refresh Live</button>
+</div>
+
+<h2 style="font-size: 1.1rem; margin-bottom: 12px;">Upcoming Tournaments</h2>
 <div id="tournament-container">
-<div class="loader">Loading live LTA tournament feed...</div>
+<div class="loader">Fetching radar insights...</div>
 </div>
 </div>
 
 <script>
-const RENDER_API_URL = "https://ava-lta-scraper.onrender.com/api/live-tournaments";
-const SECRET_KEY = "AGP2026!";
-const APP_PIN = "2026";
+const API_URL = 'https://ava-lta-scraper.onrender.com';
 
-function checkAuth() {
-if (localStorage.getItem('ava_app_unlocked') === 'true') {
+// Check if already authenticated locally
+window.onload = () => {
+const token = localStorage.getItem('ava_radar_token');
+if (token) {
+unlockDashboard();
+}
+};
+
+async function submitPin() {
+const pinField = document.getElementById('pin-field');
+const errorMsg = document.getElementById('pin-error');
+const enteredPin = pinField.value;
+
+try {
+// Securely verify PIN against backend endpoint
+const res = await fetch(`${API_URL}/api/verify-pin`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ pin: enteredPin })
+});
+
+const data = await res.json();
+if (data.success && data.token) {
+localStorage.setItem('ava_radar_token', data.token);
+errorMsg.style.display = 'none';
+unlockDashboard();
+} else {
+errorMsg.style.display = 'block';
+pinField.value = '';
+}
+} catch (err) {
+errorMsg.innerText = 'Server connection error';
+errorMsg.style.display = 'block';
+}
+}
+
+function unlockDashboard() {
 document.getElementById('pin-overlay').style.display = 'none';
-document.getElementById('app-content').style.display = 'block';
+document.getElementById('dashboard-content').style.display = 'block';
 fetchTournaments();
-} else {
-document.getElementById('pin-overlay').style.display = 'flex';
-document.getElementById('app-content').style.display = 'none';
-}
-}
-
-function verifyPin() {
-const entered = document.getElementById('pin-input').value;
-const errDiv = document.getElementById('pin-error');
-
-if (entered === APP_PIN) {
-localStorage.setItem('ava_app_unlocked', 'true');
-errDiv.style.display = 'none';
-checkAuth();
-} else {
-errDiv.style.display = 'block';
-document.getElementById('pin-input').value = '';
-}
 }
 
 function lockApp() {
-localStorage.removeItem('ava_app_unlocked');
-document.getElementById('pin-input').value = '';
-checkAuth();
+localStorage.removeItem('ava_radar_token');
+document.getElementById('dashboard-content').style.display = 'none';
+document.getElementById('pin-overlay').style.display = 'flex';
+document.getElementById('pin-field').value = '';
 }
-
-document.getElementById('pin-input').addEventListener('keyup', function(e) {
-if (e.key === 'Enter') {
-verifyPin();
-}
-});
 
 async function fetchTournaments() {
 const container = document.getElementById('tournament-container');
-container.innerHTML = '<div class="loader">Fetching live LTA entries...</div>';
+const token = localStorage.getItem('ava_radar_token') || 'AGP2026!';
+container.innerHTML = '<div class="loader">Scanning 100mi radius for 10U G3/G4 events...</div>';
 
 try {
-const response = await fetch(RENDER_API_URL, {
-headers: {
-'X-App-Token': SECRET_KEY
-}
+const response = await fetch(`${API_URL}/api/live-tournaments`, {
+headers: { 'X-App-Token': token }
 });
 
-if (!response.ok) {
-throw new Error(`Server returned status: ${response.status}`);
+if (!response.ok) throw new Error('Unauthorized or network error');
+const data = await response.json();
+
+// Update Profile Header
+if (data.playerProfile) {
+document.getElementById('player-stats').innerHTML = `
+🎾 <strong>${data.playerProfile.name}</strong> (${data.playerProfile.ageGroup}) |
+⭐ Recent Form: <strong>${data.playerProfile.recentFormPoints} pts</strong> |
+🏆 National Rank: <strong>#${data.playerProfile.nationalRank}</strong>
+`;
 }
 
-const data = await response.json();
-renderTournaments(data);
+const list = data.tournaments || data;
+renderTournaments(list);
 } catch (err) {
-container.innerHTML = `
-<div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 16px; border-radius: 12px; color: #fca5a5;">
-<strong>Connection Error:</strong><br>
-${err.message}<br><br>
-<small>Check that your Render server is live and that environment variable APP_SECRET_KEY is set to AGP2026!</small>
-</div>
-`;
+container.innerHTML = `<div class="loader" style="color: #ef4444;">Failed to load radar data. Please re-authenticate.</div>`;
 }
 }
 
@@ -396,21 +292,40 @@ return;
 
 container.innerHTML = tournaments.map(t => `
 <div class="tournament-card">
-<span class="grade-badge ${t.grade ? t.grade.toLowerCase() : 'g4'}">${t.grade || 'G4'}</span>
-<div class="t-title">${t.name}</div>
-<div class="t-info">📍 ${t.location} (${t.distanceMiles} mi)</div>
-<div class="t-info">📅 ${t.startDate}</div>
-<div class="t-info">👥 Entrants: ${t.entrantsCount || 0} players</div>
-${t.analysis ? `<div style="margin-top: 10px; padding: 8px 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 6px; font-size: 0.8rem; color: #93c5fd;">💡 <strong>Radar Analysis:</strong> ${t.analysis}</div>` : ''}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+<span class="badge-g4" style="padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">${t.grade || 'G4'}</span>
+<span style="font-size: 0.8rem; color: #34d399; font-weight: 600;">Chance: ${t.chanceRating || 'Solid Draw'}</span>
+</div>
 
-<div class="t-actions">
-<a href="${t.ltaUrl}" target="_blank" class="btn btn-primary">View on LTA</a>
+<div style="font-size: 1.05rem; font-weight: bold; color: #f8fafc; margin-bottom: 4px;">${t.name}</div>
+<div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 4px;">📍 ${t.location} (${t.distanceMiles} mi)</div>
+<div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">📅 ${t.startDate} | 👥 Entrants: ${t.entrantsCount || 0}</div>
+
+${t.analysis ? `
+<div style="margin: 10px 0; padding: 8px 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 6px; font-size: 0.8rem; color: #93c5fd;">
+💡 <strong>Radar Analysis:</strong> ${t.analysis}
+</div>
+` : ''}
+
+${t.fieldEntrants ? `
+<div style="margin-top: 10px; font-size: 0.8rem; background: rgba(15, 23, 42, 0.5); padding: 8px; border-radius: 6px;">
+<div style="font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Notable Field Entrants & Points:</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px;">
+${t.fieldEntrants.map(e => `
+<span style="background: ${e.isUser ? '#1e40af' : '#334155'}; color: ${e.isUser ? '#bfdbfe' : '#e2e8f0'}; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">
+${e.name} (${e.points} pts) ${e.isUser ? '⭐' : ''}
+</span>
+`).join('')}
+</div>
+</div>
+` : ''}
+
+<div style="margin-top: 12px; text-align: right;">
+<a href="${t.ltaUrl}" target="_blank" style="background: #2563eb; color: white; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-block;">View on LTA ↗</a>
 </div>
 </div>
 `).join('');
 }
-
-checkAuth();
 </script>
 </body>
 </html>
