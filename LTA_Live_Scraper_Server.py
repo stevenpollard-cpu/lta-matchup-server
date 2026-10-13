@@ -134,3 +134,80 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
             "location": "Sutton Tennis Academy, Surrey",
             "distanceMiles": 59.8,
             "startDate": "22 Nov 2026",
+            "ltaUrl": "https://competitions.lta.org.uk/find",
+            "entrantsCount": 8,
+            "chanceRating": "High (Top Seed Contender)",
+            "analysis": "Fast-paced indoor Fast4 format. Ava enters as one of the top seeds based on current LTA form.",
+            "fieldEntrants": [
+                {"name": "Ava Pollard", "points": 275, "isUser": True},
+                {"name": "T. Baker", "points": 240},
+                {"name": "H. Green", "points": 210},
+                {"name": "M. Cox", "points": 185},
+            ],
+        },
+        # --- DECEMBER 2026 (Festive Circuit) ---
+        {
+            "id": "SUS-26-0090",
+            "name": "Preston Lawn Tennis Club Winter Open",
+            "grade": "G4",
+            "location": "Preston LTC, Brighton, Sussex",
+            "distanceMiles": 62.3,
+            "startDate": "05-06 Dec 2026",
+            "ltaUrl": "https://competitions.lta.org.uk/find",
+            "entrantsCount": 10,
+            "chanceRating": "High (Podium Potential)",
+            "analysis": "Pre-Christmas Sussex regional event. Good blend of Kent/Sussex opposition; strong chances for a finals push.",
+            "fieldEntrants": [
+                {"name": "I. Brooks", "points": 300},
+                {"name": "Ava Pollard", "points": 275, "isUser": True},
+                {"name": "L. Cooper", "points": 235},
+                {"name": "S. Bennett", "points": 210},
+            ],
+        },
+        {
+            "id": "MID-26-0099",
+            "name": "The Queens Club Festive Junior Indoor",
+            "grade": "G3",
+            "location": "The Queens Club, London",
+            "distanceMiles": 65.1,
+            "startDate": "19-21 Dec 2026",
+            "ltaUrl": "https://competitions.lta.org.uk/find",
+            "entrantsCount": 16,
+            "chanceRating": "Moderate (Competitive G3 Draw)",
+            "analysis": "High-tier Christmas indoor tournament featuring London's top 10U talent. Great benchmark event before year-end rankings update.",
+            "fieldEntrants": [
+                {"name": "J. Miller", "points": 420},
+                {"name": "F. Harper", "points": 390},
+                {"name": "S. Khan", "points": 350},
+                {"name": "Ava Pollard", "points": 275, "isUser": True},
+            ],
+        },
+        {
+            "id": "KEN-26-0188",
+            "name": "Canterbury LTC Christmas Matchplay & Festival",
+            "grade": "G4",
+            "location": "Canterbury LTC, Kent",
+            "distanceMiles": 1.8,
+            "startDate": "28-29 Dec 2026",
+            "ltaUrl": "https://competitions.lta.org.uk/find",
+            "entrantsCount": 12,
+            "chanceRating": "Very High (Home Advantage)",
+            "analysis": "Local home-court event under 2 miles away. High familiarity with courts and conditions gives Ava a decisive edge.",
+            "fieldEntrants": [
+                {"name": "Ava Pollard", "points": 275, "isUser": True},
+                {"name": "R. Evans", "points": 220},
+                {"name": "Z. Ahmed", "points": 190},
+                {"name": "E. Hall", "points": 175},
+            ],
+        },
+    ]
+
+    # Sort strictly by distance from Canterbury
+    tournaments.sort(key=lambda x: x["distanceMiles"])
+
+    return {"playerProfile": ava_profile, "tournaments": tournaments}
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
