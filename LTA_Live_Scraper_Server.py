@@ -16,6 +16,7 @@ app.add_middleware(
 )
 
 SECRET_KEY = os.getenv("APP_SECRET_KEY", "AGP2026!")
+APP_PIN = os.getenv("APP_PIN_CODE", "2026")
 
 # Canterbury, Kent (CT2 7LN) Coordinates
 CANTERBURY_LAT = 51.2974
@@ -35,6 +36,15 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
 def root():
     return {"status": "Ava LTA Personalized Radar Operational", "player": "Ava Pollard"}
 
+@app.post("/api/verify-pin")
+def verify_pin(data: dict):
+    """Secure Server-Side PIN Check"""
+    user_pin = str(data.get("pin", "")).strip()
+    if user_pin == APP_PIN:
+        return {"success": True, "token": SECRET_KEY}
+    else:
+        raise HTTPException(status_code=401, detail="Invalid PIN")
+
 @app.get("/api/live-tournaments")
 def get_tournaments(x_app_token: Optional[str] = Header(None)):
     if x_app_token != SECRET_KEY:
@@ -48,7 +58,6 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
         "nationalRank": 214
     }
 
-    # Tournaments with full field breakdown & chance ratings for Ava
     tournaments = [
         {
             "id": "KEN-26-0082",
@@ -118,11 +127,4 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
             "entrantsCount": 16,
             "chanceRating": "Moderate (Challenging G3 Field)",
             "analysis": "Top-tier G3 event featuring multiple players above 350+ points. Excellent test for ranking progression and LTA bonus points.",
-            "fieldEntrants": [
-                {"name": "J. Miller", "points": 420},
-                {"name": "F. Harper", "points": 390},
-                {"name": "S. Khan", "points": 350},
-                {"name": "Ava Pollard", "points": 275, "isUser": True}
-            ]
-        }
-    ]
+            "fieldEnt
