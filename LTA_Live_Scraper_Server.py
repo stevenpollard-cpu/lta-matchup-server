@@ -38,7 +38,6 @@ def root():
 
 @app.post("/api/verify-pin")
 def verify_pin(data: dict):
-    """Secure Server-Side PIN Check"""
     user_pin = str(data.get("pin", "")).strip()
     if user_pin == APP_PIN:
         return {"success": True, "token": SECRET_KEY}
@@ -58,14 +57,16 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
         "nationalRank": 214
     }
 
+    # Expanded Winter Circuit through December 2026
     tournaments = [
+        # --- OCTOBER 2026 ---
         {
             "id": "KEN-26-0082",
             "name": "Bromley Lawn Tennis Autumn Junior Tournament",
             "grade": "G4",
             "location": "Bromley Lawn Tennis Club, Kent",
             "distanceMiles": 48.2,
-            "startDate": "October 2026 Half-Term",
+            "startDate": "24–26 Oct 2026",
             "ltaUrl": "https://competitions.lta.org.uk/find",
             "entrantsCount": 10,
             "chanceRating": "High (Top 4 Seed Potential)",
@@ -75,8 +76,7 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
                 {"name": "M. Davies", "points": 310},
                 {"name": "Ava Pollard", "points": 275, "isUser": True},
                 {"name": "E. Wilson", "points": 250},
-                {"name": "L. Chen", "points": 220},
-                {"name": "C. Roberts", "points": 195}
+                {"name": "L. Chen", "points": 220}
             ]
         },
         {
@@ -85,7 +85,7 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
             "grade": "G4",
             "location": "The Parklangley Club, Beckenham, Kent",
             "distanceMiles": 51.0,
-            "startDate": "October 2026 Half-Term",
+            "startDate": "28–29 Oct 2026",
             "ltaUrl": "https://competitions.lta.org.uk/find",
             "entrantsCount": 12,
             "chanceRating": "Medium-High (Favorable Quarter)",
@@ -94,37 +94,55 @@ def get_tournaments(x_app_token: Optional[str] = Header(None)):
                 {"name": "A. Smith", "points": 360},
                 {"name": "H. Johnson", "points": 325},
                 {"name": "Ava Pollard", "points": 275, "isUser": True},
-                {"name": "P. Patel", "points": 260},
-                {"name": "K. Brown", "points": 240}
+                {"name": "P. Patel", "points": 260}
             ]
         },
+
+        # --- NOVEMBER 2026 ---
         {
-            "id": "SUR-26-0112",
-            "name": "Croydon High Sports Club - Autumn Open",
-            "grade": "G4",
-            "location": "Croydon High Sports Club, Surrey",
-            "distanceMiles": 58.4,
-            "startDate": "October 2026",
-            "ltaUrl": "https://competitions.lta.org.uk/find",
-            "entrantsCount": 8,
-            "chanceRating": "High (Podium Contender)",
-            "analysis": "Smaller regional draw. Average opponent points sit around 240, giving Ava a strong statistical edge.",
-            "fieldEntrants": [
-                {"name": "E. Clarke", "points": 310},
-                {"name": "Ava Pollard", "points": 275, "isUser": True},
-                {"name": "R. Evans", "points": 250},
-                {"name": "Z. Ahmed", "points": 210}
-            ]
-        },
-        {
-            "id": "MID-26-0099",
-            "name": "The Queens Club October Half-Term Weeklong",
+            "id": "KEN-26-0105",
+            "name": "Bromley Tennis Centre Winter Regional Tour (WRT)",
             "grade": "G3",
-            "location": "The Queens Club, London",
-            "distanceMiles": 65.1,
-            "startDate": "October 2026",
+            "location": "Bromley Tennis Centre, Orpington, Kent",
+            "distanceMiles": 49.5,
+            "startDate": "14–15 Nov 2026",
             "ltaUrl": "https://competitions.lta.org.uk/find",
             "entrantsCount": 16,
-            "chanceRating": "Moderate (Challenging G3 Field)",
-            "analysis": "Top-tier G3 event featuring multiple players above 350+ points. Excellent test for ranking progression and LTA bonus points.",
-            "fieldEnt
+            "chanceRating": "Moderate (Tier 1 Regional Field)",
+            "analysis": "Premium Winter Regional Tour event. Ideal opportunity to test form against top 150 national players and earn valuable G3 bonus points.",
+            "fieldEntrants": [
+                {"name": "O. Wright", "points": 410},
+                {"name": "C. Hughes", "points": 380},
+                {"name": "K. Zhang", "points": 330},
+                {"name": "Ava Pollard", "points": 275, "isUser": True},
+                {"name": "B. Scott", "points": 260}
+            ]
+        },
+        {
+            "id": "SUR-26-0140",
+            "name": "Sutton Tennis Academy November Fast4 Open",
+            "grade": "G4",
+            "location": "Sutton Tennis Academy, Surrey",
+            "distanceMiles": 59.8,
+            "startDate": "22 Nov 2026",
+            "ltaUrl": "https://competitions.lta.org.uk/find",
+            "entrantsCount": 8,
+            "chanceRating": "High (Top Seed Contender)",
+            "analysis": "Fast-paced indoor Fast4 format. Ava enters as one of the top seeds based on current LTA form.",
+            "fieldEntrants": [
+                {"name": "Ava Pollard", "points": 275, "isUser": True},
+                {"name": "T. Baker", "points": 240},
+                {"name": "H. Green", "points": 210},
+                {"name": "M. Cox", "points": 185}
+            ]
+        },
+
+        # --- DECEMBER 2026 (Festive Circuit) ---
+        {
+            "id": "SUS-26-0090",
+            "name": "Preston Lawn Tennis Club Winter Open",
+            "grade": "G4",
+            "location": "Preston LTC, Brighton, Sussex",
+            "distanceMiles": 62.3,
+            "startDate": "05–06 Dec 2026",
+            "l
