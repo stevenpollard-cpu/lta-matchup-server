@@ -1,8 +1,7 @@
 import os
 import math
 import re
-import httpx
-from bs4 import BeautifulSoup
+import urllib.request
 import uvicorn
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -57,84 +56,59 @@ def verify_pin(data: dict):
         raise HTTPException(status_code=401, detail="Invalid PIN")
 
 
-async def fetch_real_lta_tournaments():
-    """Scrapes official live LTA competitions for 10U / Kent regional events."""
-    lta_search_url = "https://competitions.lta.org.uk/find?Q=canterbury&Distance=50"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
-    }
-
+def scrape_live_lta_competitions():
+    """Renders real web searches directly from competitions.lta.org.uk."""
     tournaments = []
 
+    # Official LTA search page URL
+    lta_search_url = "https://competitions.lta.org.uk/find?Q=Kent&Distance=50"
+
+    req = urllib.request.Request(
+        lta_search_url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        },
+    )
+
     try:
-        async with httpx.AsyncClient(
-            timeout=10.0, follow_redirects=True
-        ) as client:
-            response = await client.get(lta_search_url, headers=headers)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, "html.parser")
-                cards = soup.select(
-                    ".tournament-card, .search-result-item, .media"
+        with urllib.request.urlopen(req, timeout=10) as response:
+            if response.status == 200:
+                html_content = response.read().decode("utf-8", errors="ignore")
+
+                # Extract tournament links and IDs from live page HTML
+                matches = re.findall(
+                    r'title="([^"]+)".*?href="(/tournament/([a-f0-9\-]+))"',
+                    html_content,
+                    re.DOTALL | re.IGNORECASE,
                 )
 
-                for idx, card in enumerate(cards[:10]):
-                    title_elem = card.select_one(
-                        "h3, h4, .title, a.tournament-link"
-                    )
-                    location_elem = card.select_one(
-                        ".location, .venue, .subtitle"
-                    )
-                    date_elem = card.select_one(".date, .time")
-                    link_elem = card.select_one(
-                        "a[href*='/tournament/'], a[href*='/find/']"
-                    )
-
-                    name = (
-                        title_elem.get_text(strip=True)
-                        if title_elem
-                        else "LTA Junior Event"
-                    )
-                    location = (
-                        location_elem.get_text(strip=True)
-                        if location_elem
-                        else "Kent / South East"
-                    )
-                    start_date = (
-                        date_elem.get_text(strip=True)
-                        if date_elem
-                        else "Upcoming 2026"
-                    )
-                    lta_url = (
-                        "https://competitions.lta.org.uk" + link_elem["href"]
-                        if link_elem and link_elem.has_attr("href")
-                        else "https://competitions.lta.org.uk/find"
-                    )
-
-                    # Determine grade from title
-                    grade = "G4"
-                    if "Grade 3" in name or "G3" in name:
-                        grade = "G3"
-                    elif (
-                        "Grade 5" in name
-                        or "G5" in name
-                        or "Matchplay" in name
-                    ):
-                        grade = "G5"
+                for idx, (title, relative_link, tourney_id) in enumerate(
+                    matches[:15]
+                ):
+                    clean_title = title.strip()
+                    if len(clean_title) < 3:
+                        continue
 
                     tournaments.append(
                         {
-                            "id": f"LTA-LIVE-{idx+1}",
-                            "name": name,
-                            "grade": grade,
-                            "location": location,
-                            "distanceMiles": (
-                                12.5 if "Canterbury" in location else 45.0
+                            "id": f"LTA-{tourney_id[:8].upper()}",
+                            "name": clean_title,
+                            "grade": (
+                                "G4"
+                                if "Grade 4" in clean_title
+                                else (
+                                    "G3"
+                                    if "Grade 3" in clean_title
+                                    else "LTA Event"
+                                )
                             ),
-                            "startDate": start_date,
-                            "ltaUrl": lta_url,
+                            "location": "Kent / South East Region",
+                            "distanceMiles": 0.0,
+                            "startDate": "Check LTA Portal",
+                            "ltaUrl": f"https://competitions.lta.org.uk{relative_link}",
                             "entrantsCount": "Live Draw",
                             "chanceRating": "Official LTA Sanctioned Event",
-                            "analysis": f"Official LTA event hosted at {location}. Check live entry list on LTA portal for seed rankings.",
+                            "analysis": f"Official LTA event pulled live from competitions.lta.org.uk.",
                             "fieldEntrants": [
                                 {
                                     "name": "Ava Pollard",
@@ -145,49 +119,14 @@ async def fetch_real_lta_tournaments():
                         }
                     )
     except Exception as e:
-        print(f"Error fetching live LTA data: {e}")
-
-    # Fallback to verified active Kent fixtures if web fetch is unreachable
-    if not tournaments:
-        tournaments = [
-            {
-                "id": "KEN-26-CAN1",
-                "name": "Canterbury Autumn Open 2026",
-                "grade": "G4",
-                "location": "Canterbury LTC, Kent",
-                "distanceMiles": 1.8,
-                "startDate": "26–30 Oct 2026",
-                "ltaUrl": "https://competitions.lta.org.uk/find?Q=canterbury",
-                "entrantsCount": 12,
-                "chanceRating": "Very High (Home Court)",
-                "analysis": "Official weeklong LTA Grade 4 event hosted locally at Canterbury LTC.",
-                "fieldEntrants": [
-                    {"name": "Ava Pollard", "points": 275, "isUser": True}
-                ],
-            },
-            {
-                "id": "KEN-26-PKL1",
-                "name": "The Parklangley Club Autumn Grade 4",
-                "grade": "G4",
-                "location": "The Parklangley Club, Beckenham, Kent",
-                "distanceMiles": 51.0,
-                "startDate": "24 Oct–01 Nov 2026",
-                "ltaUrl": "https://competitions.lta.org.uk/find",
-                "entrantsCount": 16,
-                "chanceRating": "High Potential",
-                "analysis": "Sanctioned Kent half-term tournament.",
-                "fieldEntrants": [
-                    {"name": "Ava Pollard", "points": 275, "isUser": True}
-                ],
-            },
-        ]
+        print(f"LTA Fetch Error: {e}")
 
     tournaments.sort(key=lambda x: x["distanceMiles"])
     return tournaments
 
 
 @app.get("/api/live-tournaments")
-async def get_tournaments(x_app_token: Optional[str] = Header(None)):
+def get_tournaments(x_app_token: Optional[str] = Header(None)):
     if x_app_token != SECRET_KEY:
         raise HTTPException(status_code=403, detail="Unauthorized access token")
 
@@ -198,7 +137,7 @@ async def get_tournaments(x_app_token: Optional[str] = Header(None)):
         "nationalRank": 214,
     }
 
-    live_tournaments = await fetch_real_lta_tournaments()
+    live_tournaments = scrape_live_lta_competitions()
 
     return {"playerProfile": ava_profile, "tournaments": live_tournaments}
 
